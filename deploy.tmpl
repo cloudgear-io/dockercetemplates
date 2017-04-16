@@ -1,1 +1,87 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Ubuntu 1604 LTS Instance",
+    "Metadata": {
+        "CentosAMIVersion": "Ubuntu 16.04 LTS HVM EBS",
+        "CentosURL": "https://console.aws.amazon.com/ec2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-80861296"
+    },
+    "Parameters": {
+        "SSHKeyName": {
+            "Description": "SSH Key Name",
+            "Type": "String"
+        }
+    },
+    "Mappings": {
+        "RegionMap": {
+            "us-east-1": {
+                "Ubuntu1604LTS": "ami-80861296"
+            }
+        }
+    },
+    "Resources": {
+        "SecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security Group",
+                "SecurityGroupIngress": [{
+                    "FromPort": "0",
+                    "IpProtocol": "-1",
+                    "CidrIp": "0.0.0.0/0",
+                    "ToPort": "65535"
+                }]
+            }
+        },
+        "Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Metadata": {
+                "UserDataComment1": "Custom script as user data to install docker-ce docker-compose and docker-machine.",
+                "UserDataComment2": "In this example docker-ce is installed",
+                "ImageIdComment": "Not validated"
+            },
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "Ubuntu1604LTS"
+                    ]
+                },
+                "InstanceType": "t2.micro",
+                "KeyName": {
+                    "Ref": "SSHKeyName"
+                },
+                "SecurityGroups": [{
+                    "Ref": "SecurityGroup"
+                }],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": ["", [
+                            "#!/bin/bash -xe\n",
+                            "apt-get -y update\n",
+                            "apt-get -y upgrade\n",
+                            "apt-get install -y  linux-image-extra-virtual\n",
+                            "apt-get install -y apt-transport-https ca-certificates curl software-properties-common\n",
 
+                            "# Install docker-ce repo \n",
+                            "curl  ",
+                            "-fsSL ",
+                            "https://download.docker.com/linux/ubuntu/gpg | apt-key add -", "\n",
+
+                            "add-apt-repository ",
+                            "'deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'", "\n",
+
+                            "groupadd docker\n",
+                            "usermod -aG docker ubuntu\n",
+                            "apt-get -y update\n",
+                            "apt-get install -y docker-ce\n",
+                            "systemctl start docker\n",
+                            "systemctl enable docker\n"
+                        ]]
+                    }
+                }
+            }
+        }
+    }
+}
