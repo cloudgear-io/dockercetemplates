@@ -1,0 +1,82 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CentOS 7.3 Instance",
+    "Metadata": {
+        "CentosAMIVersion": "CentOS 7.3 from Marketplace",
+        "CentosURL": "https://aws.amazon.com/marketplace/pp/B06XKGW8X2"
+    },
+    "Parameters": {
+        "SSHKeyName": {
+            "Description": "SSH Key Name",
+            "Type": "String"
+        }
+    },
+    "Mappings": {
+        "RegionMap": {
+            "us-east-1": {
+                "CentOS73": "ami-267fdc30"
+            }
+        }
+    },
+    "Resources": {
+        "SecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security Group",
+                "SecurityGroupIngress": [{
+                    "FromPort": "0-65535",
+                    "IpProtocol": "ANY",
+                    "CidrIp": "0.0.0.0/0",
+                    "ToPort": "ANY"
+                }]
+            }
+        },
+        "Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Metadata": {
+                "UserDataComment1": "Custom script as user data to install docker-ce docker-compose and docker-machine.",
+                "UserDataComment2": "In this example docker-ce is installed and the status is passed to the  outputs",
+                "ImageIdComment": "Not validated"
+            },
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "CentOS73"
+                    ]
+                },
+                "InstanceType": "t2.micro",
+                "KeyName": {
+                    "Ref": "SSHKeyName"
+                },
+                "SecurityGroups": [{
+                    "Ref": "SecurityGroup"
+                }],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": ["", [
+                            "#!/bin/bash -v\n",
+                            "su -c 'yum install -y yum-utils' ec2-user\n",
+                            "su -c 'yum-config-manager   --add-repo https://download.docker.com/linux/centos/docker-ce.repo' ec2-user\n",
+                            "su -c 'yum makecache fast' ec2-user\n",
+                            "su -c 'yum install -y docker-ce' ec2-user\n",
+                            "su -c 'systemctl start docker' ec2-user\n",
+                            "su -c 'gpasswd -a ec2-user docker' ec2-user\n",
+                            "su -c 'systemctl enable docker ' ec2-user\n",
+                            "su -c 'curl -L https://github.com/docker/compose/releases/download/1.12.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose' ec2-user\n",
+                            "su -c 'curl -L https://github.com/docker/machine/releases/download/v0.10.0/docker-machine-`uname -s`-`uname -m` >/usr/local/bin/docker-machine' ec2-user\n",
+                            "su -c 'chmod +x /usr/local/bin/docker-machine' ec2-user\n",
+                            "su -c 'chmod +x /usr/local/bin/docker-compose' ec2-user\n",
+                            "su -c 'export PATH=$PATH:/usr/local/bin/' ec2-user\n",
+                            "su -c 'systemctl restart docker' ec2-user\n",
+                            "su -c 'curl http://169.254.169.254/latest/user-data| sed '$d' | sh' ec2-user"
+                        ]]
+                    }
+                }
+            }
+        }
+    }
+}
