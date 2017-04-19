@@ -30,6 +30,16 @@
             "Description": "The Host Port to map 8080 of rancher/server",
             "Type": "String",
             "Default": "8080"
+        },
+        "NodeRedHostPort": {
+            "Description": "The Host Port to map 1880 of node-red container",
+            "Type": "String",
+            "Default": "1880"
+        },
+        "PortainerHostPort": {
+            "Description": "The Host Port to map 9000 of portainer container",
+            "Type": "String",
+            "Default": "9000"
         }
     },
     "Mappings": {
@@ -114,6 +124,13 @@
                             "docker run -dti -p ", {
                                 "Ref": "RancherServerHostPort"
                             }, ":8080 --name=rancherserver --restart=always rancher/server\n",
+                            "docker run -dti --restart=always --name=azure-cli-python azuresdk/azure-cli-python\n",
+                            "docker run -dti -p ", {
+                                "Ref": "NodeRedHostPort"
+                            }, ":1880 --restart=always --name=azurenodered dwaiba/azureiot-nodered\n",
+                            "docker run -dp ", {
+                                "Ref": "PortainerHostPort"
+                            }, ":9000 -v /var/run/docker.sock:/var/run/docker.sock --restart=always --name=portainer portainer/portainer\n",
                             "apt install -y python-pip\n",
                             "pip install --upgrade pip\n",
                             "pip install awscli\n",
