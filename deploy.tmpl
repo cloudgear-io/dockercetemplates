@@ -92,10 +92,10 @@
                     "Fn::Base64": {
                         "Fn::Join": ["", [
                             "#!/bin/bash -xe\n",
-                            "apt-get -y update\n",
-                            "apt-get -y upgrade\n",
-                            "apt-get install -y  linux-image-extra-virtual\n",
-                            "apt-get install -y apt-transport-https ca-certificates curl software-properties-common\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get install -y  linux-image-extra-virtual\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https ca-certificates curl software-properties-common\n",
 
                             "# Install docker-ce repo \n",
                             "curl  ",
@@ -107,8 +107,11 @@
 
                             "groupadd docker\n",
                             "usermod -aG docker ubuntu\n",
-                            "apt-get -y update\n",
-                            "apt-get install -y docker-ce\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
+                            "DEBIAN_FRONTEND=noninteractive update-initramfs -u\n",
+                            "grub-mkconfig -o /boot/grub/grub.cfg\n",
+                            "update-grub\n",
+                            "DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce\n",
                             "systemctl start docker\n",
                             "systemctl enable docker\n",
                             "curl -L https://github.com/docker/compose/releases/download/", {
@@ -131,7 +134,7 @@
                             "docker run -dp ", {
                                 "Ref": "PortainerHostPort"
                             }, ":9000 -v /var/run/docker.sock:/var/run/docker.sock --restart=always --name=portainer portainer/portainer\n",
-                            "apt install -y python-pip\n",
+                            "DEBIAN_FRONTEND=noninteractive apt install -y python-pip\n",
                             "pip install --upgrade pip\n",
                             "pip install awscli\n",
                             "complete -C aws_completer aws\n"
