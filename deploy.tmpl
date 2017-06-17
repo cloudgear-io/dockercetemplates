@@ -130,7 +130,7 @@
                             "docker run -dti --restart=always --name=azure-cli-python azuresdk/azure-cli-python\n",
                             "docker run -dti -p ", {
                                 "Ref": "NodeRedHostPort"
-                            }, ":1880 --restart=always --name=azurenodered dwaiba/azureiot-nodered\n",
+                            }, ":1880 --restart=always --name=azurenodered dwaiba/node-red\n",
                             "docker run -dp ", {
                                 "Ref": "PortainerHostPort"
                             }, ":9000 -v /var/run/docker.sock:/var/run/docker.sock --restart=always --name=portainer portainer/portainer\n",
