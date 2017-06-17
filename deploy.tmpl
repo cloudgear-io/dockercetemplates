@@ -1,136 +1,137 @@
 {
-    "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Ubuntu 1604 LTS Instance",
-    "Metadata": {
-        "CentosAMIVersion": "Ubuntu 16.04 LTS HVM EBS",
-        "CentosURL": "https://console.aws.amazon.com/ec2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-80861296"
-    },
-    "Parameters": {
-        "SSHKeyName": {
-            "Description": "SSH Key Name - EC2 KeyPair Name",
-            "Type": "String",
-            "Default": "default"
-        },
-        "MachineInstanceType": {
-            "Description": "The EC2 Instance Type",
-            "Type": "String",
-            "Default": "t2.micro"
-        },
-        "DockerComposeVersion": {
-            "Description": "docker-compose release version",
-            "Type": "String",
-            "Default": "1.14.0-rc2"
-        },
-        "DockerMachineVersion": {
-            "Description": "docker-machine release version",
-            "Type": "String",
-            "Default": "0.12.0-rc2"
-        },
-        "RancherServerHostPort": {
-            "Description": "The Host Port to map 8080 of rancher/server",
-            "Type": "String",
-            "Default": "8080"
-        },
-        "NodeRedHostPort": {
-            "Description": "The Host Port to map 1880 of node-red container",
-            "Type": "String",
-            "Default": "1880"
-        },
-    "Mappings": {
-        "RegionMap": {
-            "us-east-1": {
-                "Ubuntu1604LTS": "ami-80861296"
-            }
-        }
-    },
-    "Resources": {
-        "SecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "GroupDescription": "Security Group",
-                "SecurityGroupIngress": [{
-                    "FromPort": "0",
-                    "IpProtocol": "-1",
-                    "CidrIp": "0.0.0.0/0",
-                    "ToPort": "65535"
-                }]
-            }
-        },
-        "Instance": {
-            "Type": "AWS::EC2::Instance",
-            "Metadata": {
-                "UserDataComment1": "Custom script as user data to install docker-ce docker-compose and docker-machine.",
-                "UserDataComment2": "In this example docker-ce is installed",
-                "ImageIdComment": "Not validated"
-            },
-            "Properties": {
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "RegionMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "Ubuntu1604LTS"
-                    ]
-                },
-                "InstanceType": {
-                    "Ref": "MachineInstanceType"
-                },
-                "KeyName": {
-                    "Ref": "SSHKeyName"
-                },
-                "SecurityGroups": [{
-                    "Ref": "SecurityGroup"
-                }],
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": ["", [
-                            "#!/bin/bash -xe\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get install -y  linux-image-extra-virtual\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https ca-certificates curl software-properties-common\n",
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Ubuntu 1604 LTS Instance",
+	"Metadata": {
+		"CentosAMIVersion": "Ubuntu 16.04 LTS HVM EBS",
+		"CentosURL": "https://console.aws.amazon.com/ec2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-80861296"
+	},
+	"Parameters": {
+		"SSHKeyName": {
+			"Description": "SSH Key Name - EC2 KeyPair Name",
+			"Type": "String",
+			"Default": "default"
+		},
+		"MachineInstanceType": {
+			"Description": "The EC2 Instance Type",
+			"Type": "String",
+			"Default": "t2.micro"
+		},
+		"DockerComposeVersion": {
+			"Description": "docker-compose release version",
+			"Type": "String",
+			"Default": "1.14.0-rc2"
+		},
+		"DockerMachineVersion": {
+			"Description": "docker-machine release version",
+			"Type": "String",
+			"Default": "0.12.0-rc2"
+		},
+		"RancherServerHostPort": {
+			"Description": "The Host Port to map 8080 of rancher/server",
+			"Type": "String",
+			"Default": "8080"
+		},
+		"NodeRedHostPort": {
+			"Description": "The Host Port to map 1880 of node-red container",
+			"Type": "String",
+			"Default": "1880"
+		},
+		"Mappings": {
+			"RegionMap": {
+				"us-east-1": {
+					"Ubuntu1604LTS": "ami-80861296"
+				}
+			}
+		},
+		"Resources": {
+			"SecurityGroup": {
+				"Type": "AWS::EC2::SecurityGroup",
+				"Properties": {
+					"GroupDescription": "Security Group",
+					"SecurityGroupIngress": [{
+						"FromPort": "0",
+						"IpProtocol": "-1",
+						"CidrIp": "0.0.0.0/0",
+						"ToPort": "65535"
+					}]
+				}
+			},
+			"Instance": {
+				"Type": "AWS::EC2::Instance",
+				"Metadata": {
+					"UserDataComment1": "Custom script as user data to install docker-ce docker-compose and docker-machine.",
+					"UserDataComment2": "In this example docker-ce is installed",
+					"ImageIdComment": "Not validated"
+				},
+				"Properties": {
+					"ImageId": {
+						"Fn::FindInMap": [
+							"RegionMap",
+							{
+								"Ref": "AWS::Region"
+							},
+							"Ubuntu1604LTS"
+						]
+					},
+					"InstanceType": {
+						"Ref": "MachineInstanceType"
+					},
+					"KeyName": {
+						"Ref": "SSHKeyName"
+					},
+					"SecurityGroups": [{
+						"Ref": "SecurityGroup"
+					}],
+					"UserData": {
+						"Fn::Base64": {
+							"Fn::Join": ["", [
+								"#!/bin/bash -xe\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get -y upgrade\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get install -y  linux-image-extra-virtual\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get install -y apt-transport-https ca-certificates curl software-properties-common\n",
 
-                            "# Install docker-ce repo \n",
-                            "curl  ",
-                            "-fsSL ",
-                            "https://download.docker.com/linux/ubuntu/gpg | apt-key add -", "\n",
+								"# Install docker-ce repo \n",
+								"curl  ",
+								"-fsSL ",
+								"https://download.docker.com/linux/ubuntu/gpg | apt-key add -", "\n",
 
-                            "add-apt-repository ",
-                            "'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'", "\n",
+								"add-apt-repository ",
+								"'deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable'", "\n",
 
-                            "groupadd docker\n",
-                            "usermod -aG docker ubuntu\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
-                            "DEBIAN_FRONTEND=noninteractive update-initramfs -u\n",
-                            "grub-mkconfig -o /boot/grub/grub.cfg\n",
-                            "update-grub\n",
-                            "DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce\n",
-                            "systemctl start docker\n",
-                            "systemctl enable docker\n",
-                            "curl -L https://github.com/docker/compose/releases/download/", {
-                                "Ref": "DockerComposeVersion"
-                            }, "/docker-compose-`uname -s`-`uname -m` >/usr/local/bin/docker-compose\n",
-                            "curl -L https://github.com/docker/machine/releases/download/v", {
-                                "Ref": "DockerMachineVersion"
-                            }, "/docker-machine-`uname -s`-`uname -m` >/usr/local/bin/docker-machine\n",
-                            "chmod +x /usr/local/bin/docker-machine\n",
-                            "chmod +x /usr/local/bin/docker-compose\n",
-                            "export PATH=$PATH:/usr/local/bin/\n",
-                            "systemctl restart docker\n",
-                            "docker run -dti -p ", {
-                                "Ref": "RancherServerHostPort"
-                            }, ":8080 --name=rancherserver --restart=always rancher/server\n",
-                            "docker run -dti -p ", {
-                                "Ref": "NodeRedHostPort"
-                            }, ":1880 --restart=always --name=nodered dwaiba/node-red\n",
-                            "DEBIAN_FRONTEND=noninteractive apt install -y python-pip\n",
-                            "pip install --upgrade pip\n",
-                            "pip install awscli\n"
-                        ]]
-                    }
-                }
-            }
-        }
-    }
+								"groupadd docker\n",
+								"usermod -aG docker ubuntu\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get -y update\n",
+								"DEBIAN_FRONTEND=noninteractive update-initramfs -u\n",
+								"grub-mkconfig -o /boot/grub/grub.cfg\n",
+								"update-grub\n",
+								"DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce\n",
+								"systemctl start docker\n",
+								"systemctl enable docker\n",
+								"curl -L https://github.com/docker/compose/releases/download/", {
+									"Ref": "DockerComposeVersion"
+								}, "/docker-compose-`uname -s`-`uname -m` >/usr/local/bin/docker-compose\n",
+								"curl -L https://github.com/docker/machine/releases/download/v", {
+									"Ref": "DockerMachineVersion"
+								}, "/docker-machine-`uname -s`-`uname -m` >/usr/local/bin/docker-machine\n",
+								"chmod +x /usr/local/bin/docker-machine\n",
+								"chmod +x /usr/local/bin/docker-compose\n",
+								"export PATH=$PATH:/usr/local/bin/\n",
+								"systemctl restart docker\n",
+								"docker run -dti -p ", {
+									"Ref": "RancherServerHostPort"
+								}, ":8080 --name=rancherserver --restart=always rancher/server\n",
+								"docker run -dti -p ", {
+									"Ref": "NodeRedHostPort"
+								}, ":1880 --restart=always --name=nodered dwaiba/node-red\n",
+								"DEBIAN_FRONTEND=noninteractive apt install -y python-pip\n",
+								"pip install --upgrade pip\n",
+								"pip install awscli\n"
+							]]
+						}
+					}
+				}
+			}
+		}
+	}
 }
