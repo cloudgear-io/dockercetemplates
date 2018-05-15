@@ -5,7 +5,7 @@
 
 
 
-https://s3.eu-central-1.amazonaws.com/cffordryrun/2018centos6.tmpl
+
 
 
 <a href="https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=Ubuntu1604DockerCE&templateURL=https:%2F%2Fs3.amazonaws.com%2Fcffordryrun%2F2018centos6.tmpl">deploy CentOS 6 us east</a>
