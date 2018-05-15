@@ -1,0 +1,71 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CentOS 6 Instance",
+    "Metadata": {
+        "CentosAMIVersion": "CentOS 6 from Marketplace",
+        "CentosURL": "https://aws.amazon.com/marketplace/pp/B00NQAYLWO"
+    },
+    "Parameters": {
+        "SSHKeyName": {
+            "Description": "SSH Key Name",
+            "Type": "String"
+        }
+    },
+    "Mappings": {
+        "RegionMap": {
+            "us-east-1": {
+                "CentOS73": "ami-e3fdd999"
+            }
+        }
+    },
+    "Resources": {
+        "SecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security Group",
+                "SecurityGroupIngress": [{
+                    "FromPort": "0-65535",
+                    "IpProtocol": "ANY",
+                    "CidrIp": "0.0.0.0/0",
+                    "ToPort": "ANY"
+                }]
+            }
+        },
+        "Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Metadata": {
+                "UserDataComment1": "Custom script as user data to install docker-ce docker-compose and docker-machine.",
+                "UserDataComment2": "In this example docker-ce is installed and the status is passed to the  outputs",
+                "ImageIdComment": "Not validated"
+            },
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "CentOS73"
+                    ]
+                },
+                "InstanceType": "t2.micro",
+                "KeyName": {
+                    "Ref": "SSHKeyName"
+                },
+                "SecurityGroups": [{
+                    "Ref": "SecurityGroup"
+                }],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": ["", [
+                            "#!/bin/bash -v\n",
+                            "su -c 'yum install -y yum-utils' ec2-user\n",
+                            "su -c 'yum makecache fast' ec2-user\n",
+                            "su -c 'yum install -y ansible git wget unzip' ec2-user"
+                        ]]
+                    }
+                }
+            }
+        }
+    }
+}
